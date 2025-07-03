@@ -1,0 +1,7 @@
+text.challenges=CHALLENGES
+text.fight-button=FIGHT!
+challenge.fight-remain=Battle starts in:
+challenge.fight=Fight!
+messages.complete-another-challenge=You cannot start this challenge because you have not completed the previous one!
+messages.need-lvl=You need to be at least level %s to start this challenge!
+messages.cooldown=You need to wait %s minutes before you can start this challenge again!

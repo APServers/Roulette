@@ -1,0 +1,7 @@
+text.challenges=ИСПЫТАНИЯ
+text.fight-button=БОЙ!
+challenge.fight-remain=Осталось до начала боя:
+challenge.fight=Бой!
+messages.complete-another-challenge=Вы не можете начать это испытание, пока не выполните предыдущее!
+messages.need-lvl=У вас должен быть хотя бы %s уровень, чтобы начать это испытание!
+messages.cooldown=Это испытание можно проходить только раз в %s минут!

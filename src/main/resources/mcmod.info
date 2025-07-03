@@ -1,0 +1,16 @@
+[
+{
+  "modid": "challengesaddon",
+  "name": "NarutoCraft Challenges Addon",
+  "description": "belongs to https://vk.com/shippudenworld",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["byby", "Assolb"],
+  "credits": "https://vk.com/shippudenworld",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

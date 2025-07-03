@@ -1,0 +1,6 @@
+text.challenges=ВИПРОБУВАННЯ
+text.fight-button=БІЙ!
+challenge.fight-remain=Залишилося до початку бою:
+challenge.fight=Бій!
+messages.complete-another-challenge=Ви не можете почати це випробування, поки не завершите попереднє!
+messages.need-lvl=У вас повинен бути хоча б %s рівень, щоб почати це випробування!
