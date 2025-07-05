@@ -5,6 +5,7 @@ import net.decentstudio.gamblingaddon.domain.Bid;
 import net.decentstudio.gamblingaddon.domain.BidSection;
 import net.decentstudio.gamblingaddon.domain.Gambler;
 import net.decentstudio.gamblingaddon.domain.GameRoom;
+import net.decentstudio.gamblingaddon.repository.BalanceRepository;
 import net.decentstudio.gamblingaddon.repository.BidRepository;
 import net.decentstudio.gamblingaddon.repository.GamblerRepository;
 import net.decentstudio.gamblingaddon.repository.GameRoomRepository;
@@ -18,13 +19,16 @@ import java.util.Random;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class RouletteGameService {
+public class RouletteGameServiceImpl {
+
     private final GamblerRepository gamblerRepository;
     private final GameRoomRepository gameRoomRepository;
     private final BidRepository bidRepository;
+    private final BalanceRepository balanceRepository;
+
     private final Random random = new Random();
     
-    public void placeBid(UUID gamblerId, int gameRoomId, BidSection section, BigDecimal amount) {
+    public void placeBid(UUID gamblerId, int gameRoomId, BidSection section, Integer amount) {
         Optional<Gambler> gamblerOpt = gamblerRepository.findById(gamblerId);
         Optional<GameRoom> roomOpt = gameRoomRepository.findById(gameRoomId);
         
@@ -44,7 +48,7 @@ public class RouletteGameService {
         }
         
         // Deduct amount from gambler
-        gambler.setBalance(gambler.getBalance().subtract(amount));
+        gambler.setBalance(gambler.getBalance() - amount);
         
         // Create and save bid
         Bid bid = new Bid(UUID.randomUUID(), gamblerId, section, amount);
@@ -116,25 +120,25 @@ public class RouletteGameService {
         }
         
         Gambler gambler = gamblerOpt.get();
-        BigDecimal payout = calculatePayout(bid);
-        gambler.setBalance(gambler.getBalance().add(payout));
+        Integer payout = calculatePayout(bid);
+        gambler.setBalance(gambler.getBalance() + payout);
         gamblerRepository.save(gambler);
     }
     
-    private BigDecimal calculatePayout(Bid bid) {
+    private Integer calculatePayout(Bid bid) {
         BidSection section = bid.getSection();
         
         // Straight number bet pays 35:1
         if (section.getNumber() != -1) {
-            return bid.getAmount().multiply(BigDecimal.valueOf(35));
+            return bid.getAmount() * 35;
         }
         
         // Color bet pays 1:1
         if (section.getColor() != null) {
-            return bid.getAmount().multiply(BigDecimal.valueOf(2)); // original + winnings
+            return bid.getAmount() * 2; // original + winnings
         }
         
-        return BigDecimal.ZERO;
+        return 0;
     }
     
     private SectionColor getColorForNumber(int number) {

@@ -15,6 +15,10 @@ public class GamblerRepositoryImpl implements GamblerRepository {
     
     @Override
     public Optional<Gambler> findById(UUID id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+
         return Optional.ofNullable(gamblers.get(id));
     }
     

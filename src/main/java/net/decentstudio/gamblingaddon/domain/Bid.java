@@ -14,6 +14,6 @@ public class Bid {
     private final UUID id;
     private final UUID gamblerId;
     private final BidSection section;
-    private final BigDecimal amount;
+    private final Integer amount;
     private boolean isWinner = false; // looks like an unused field if i dont make a bet story
 }
