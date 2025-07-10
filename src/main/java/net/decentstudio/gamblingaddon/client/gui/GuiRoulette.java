@@ -111,13 +111,13 @@ public class GuiRoulette extends NarutoCraftGuiScreen implements ITextFieldListe
     private void drawTitle() {
         GlStateManager.pushMatrix();
         String text = I18n.format("text.challenges");
-        GL11.glTranslated(width / 2 - CustomFontsEnum.MINION14.font.width(text) / 2 - 26,
-                height / 2 - 93,
+        GL11.glTranslated(width / 2D - CustomFontsEnum.MINION.getFont(14).width(text) / 2D - 26,
+                height / 2D - 93,
                 0);
 
         GL11.glScaled(2, 2, 1);
 
-        CustomFontsEnum.MINION14.font.drawString(text,
+        CustomFontsEnum.MINION.getFont(14).drawString(text,
                 0,
                 0,
                 Color.WHITE.getRGB());

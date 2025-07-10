@@ -20,9 +20,7 @@ public class BalanceRepositoryImpl implements BalanceRepository {
 
     @Override
     public void saveBalance(EntityPlayer player, int balance) {
-        INinjaPlayerSession ninjaPlayer = NarutoCraft.getSession(player).orElse(null);
-        if (ninjaPlayer != null) {
-            ninjaPlayer.setCasinoPoints(balance);
-        }
+        NarutoCraft.getSession(player).ifPresent(ninjaPlayer ->
+                ninjaPlayer.setCasinoPoints(balance));
     }
 }

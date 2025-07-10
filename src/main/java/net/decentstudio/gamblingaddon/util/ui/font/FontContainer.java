@@ -18,12 +18,12 @@ public class FontContainer {
           this.textFont = new TrueTypeFont(new Font(fontType, 0, fontSize), 1.0F);
           this.useCustomFont = !fontType.equalsIgnoreCase("minecraft");
           try {
-              System.out.println("[Fonts] Проверка директории со шрифтом.");
+              System.out.println("[Fonts] Checking font directory..");
               if (!this.useCustomFont || fontType.isEmpty() || fontType.equalsIgnoreCase("default")) {
                   this.textFont = new TrueTypeFont(new ResourceLocation(GamblingAddon.MODID, "Roboto.ttf"), fontSize, 1.0F);
               }
           } catch (Exception e) {
-              System.out.println("[Fonts] Шрифт не может быть загружен!");
+              System.out.println("[Fonts] A font cannot be loaded");
               System.out.println(e.toString());
           }
         }

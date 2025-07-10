@@ -2,17 +2,16 @@ package net.decentstudio.gamblingaddon;
 
 import net.decentstudio.gamblingaddon.network.C1PacketOpenRouletteGui;
 import net.decentstudio.gamblingaddon.network.S1PacketOpenRouletteGui;
+import net.decentstudio.gamblingaddon.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
-import ua.byby.challengesaddon.database.Database;
-import ua.byby.challengesaddon.network.*;
-import net.decentstudio.gamblingaddon.proxy.CommonProxy;
-import net.decentstudio.gamblingaddon.util.ui.font.Font;
-import net.decentstudio.gamblingaddon.util.ui.font.FontContainer;
 
 @Mod(modid = GamblingAddon.MODID,
         name = GamblingAddon.NAME,
@@ -28,7 +27,7 @@ public class GamblingAddon
 
     @SidedProxy(
         clientSide = "net.decentstudio.gamblingaddon.proxy.ClientProxy",
-        serverSide = "net.decentstudio.proxy.CommonProxy"
+        serverSide = "net.decentstudio.gamblingaddon.proxy.CommonProxy"
     )
     public static CommonProxy proxy;
 

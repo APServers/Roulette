@@ -37,8 +37,8 @@ public class SubGuiFightButton extends SubGuiButton {
                 String buttonText = I18n.format("text.fight-button");
 
                 GL11.glScaled(2, 2, 2);
-                CustomFontsEnum.MINION14.font.drawString(buttonText,
-                        width / 2 - CustomFontsEnum.MINION14.font.width(buttonText) / 2 - 20,
+                CustomFontsEnum.MINION.getFont(14).drawString(buttonText,
+                        width / 2 - CustomFontsEnum.MINION.getFont(14).width(buttonText) / 2 - 20,
                         height - 31,
                         Color.WHITE.getRGB());
 

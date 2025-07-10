@@ -3,58 +3,63 @@ package net.decentstudio.gamblingaddon.service.impl;
 import lombok.RequiredArgsConstructor;
 import net.decentstudio.gamblingaddon.domain.Bid;
 import net.decentstudio.gamblingaddon.domain.BidSection;
-import net.decentstudio.gamblingaddon.domain.Gambler;
 import net.decentstudio.gamblingaddon.domain.GameRoom;
+import net.decentstudio.gamblingaddon.integration.Integration;
 import net.decentstudio.gamblingaddon.repository.BalanceRepository;
 import net.decentstudio.gamblingaddon.repository.BidRepository;
-import net.decentstudio.gamblingaddon.repository.GamblerRepository;
 import net.decentstudio.gamblingaddon.repository.GameRoomRepository;
+import net.decentstudio.gamblingaddon.service.RouletteGameService;
 import net.decentstudio.gamblingaddon.util.game.GameStatus;
 import net.decentstudio.gamblingaddon.util.game.SectionColor;
+import net.minecraft.entity.player.EntityPlayer;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class RouletteGameServiceImpl {
+public class RouletteGameServiceImpl implements RouletteGameService {
 
-    private final GamblerRepository gamblerRepository;
     private final GameRoomRepository gameRoomRepository;
     private final BidRepository bidRepository;
     private final BalanceRepository balanceRepository;
 
     private final Random random = new Random();
     
-    public void placeBid(UUID gamblerId, int gameRoomId, BidSection section, Integer amount) {
-        Optional<Gambler> gamblerOpt = gamblerRepository.findById(gamblerId);
-        Optional<GameRoom> roomOpt = gameRoomRepository.findById(gameRoomId);
-        
-        if (!gamblerOpt.isPresent() || !roomOpt.isPresent()) {
-            throw new IllegalArgumentException("Gambler or room not found");
+    public synchronized void placeBid(EntityPlayer player, BidSection section, Integer amount) {
+        if (player == null) {
+            throw new IllegalArgumentException("Player cannot be null");
         }
-        
-        Gambler gambler = gamblerOpt.get();
+
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Bid amount must be greater than zero");
+        }
+
+        int gameRoomId = Integration.integration.getCurrentGameRoomId(player.getName());
+        Optional<GameRoom> roomOpt = gameRoomRepository.findById(gameRoomId);
+        if (!roomOpt.isPresent()) {
+            throw new IllegalArgumentException("Room not found");
+        }
+
         GameRoom room = roomOpt.get();
         
         if (room.getStatus() != GameStatus.BETTING) {
             throw new IllegalStateException("Room not accepting bids");
         }
-        
-        if (gambler.getBalance().compareTo(amount) < 0) {
+
+        int chipsBalance = balanceRepository.findBalance(player)
+                .orElseThrow(() -> new IllegalArgumentException("Player balance not found"));
+
+        if (chipsBalance < amount) {
             throw new IllegalArgumentException("Insufficient balance");
         }
         
-        // Deduct amount from gambler
-        gambler.setBalance(gambler.getBalance() - amount);
-        
-        // Create and save bid
-        Bid bid = new Bid(UUID.randomUUID(), gamblerId, section, amount);
+        balanceRepository.saveBalance(player, chipsBalance - amount);
+
+        Bid bid = new Bid(UUID.randomUUID(), player, section, amount);
         room.getBids().add(bid);
         bidRepository.save(bid);
-        gamblerRepository.save(gambler);
         gameRoomRepository.save(room);
     }
     
@@ -114,15 +119,15 @@ public class RouletteGameServiceImpl {
     }
     
     private void payoutWinner(Bid bid) {
-        Optional<Gambler> gamblerOpt = gamblerRepository.findById(bid.getGamblerId());
-        if (!gamblerOpt.isPresent()) {
+        if (bid.isWinner()) {
             return;
         }
-        
-        Gambler gambler = gamblerOpt.get();
+
+        Integer balance = balanceRepository.findBalance(bid.getPlayer())
+                .orElseThrow(() -> new IllegalArgumentException("Player balance not found"));
+
         Integer payout = calculatePayout(bid);
-        gambler.setBalance(gambler.getBalance() + payout);
-        gamblerRepository.save(gambler);
+        balanceRepository.saveBalance(bid.getPlayer(), balance + payout);
     }
     
     private Integer calculatePayout(Bid bid) {
