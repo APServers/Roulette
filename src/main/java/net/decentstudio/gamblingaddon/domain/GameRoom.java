@@ -13,6 +13,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GameRoom {
     private final int id;
-    private final List<Bid> bids = new ArrayList<>();
+    private final List<Bet> bids = new ArrayList<>();
     private GameStatus status = GameStatus.WAITING;
 }

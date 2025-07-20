@@ -1,23 +1,18 @@
 package net.decentstudio.gamblingaddon.client.gui.subgui;
 
-import com.google.common.collect.Lists;
 import com.narutocraft.client.gui.subgui.SubGuiImage;
 import net.decentstudio.gamblingaddon.client.gui.GuiRoulette;
+import net.decentstudio.gamblingaddon.dto.PlayerBetDTO;
+import net.decentstudio.gamblingaddon.util.game.SectionColor;
+import net.decentstudio.gamblingaddon.util.ui.GuiTextures;
 import net.decentstudio.gamblingaddon.util.ui.UIConstants;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import net.decentstudio.gamblingaddon.util.game.SectionColor;
-import net.decentstudio.gamblingaddon.util.ui.GuiTextures;
 
 import java.awt.*;
-import java.util.List;
 
 public class SubGuiBetBlock extends SubGuiImage {
-
-    private final List<String> players = Lists.newArrayList("Bob", "Ashley", "Den", "John", "Jane", "Stacy", "Rob", "Michael", "Tom", "Jerry");
 
     private final int blockElementsAmount = 9;
     private final SectionColor sectionColor;
@@ -42,12 +37,12 @@ public class SubGuiBetBlock extends SubGuiImage {
 
         this.sectionColor = sectionColor;
         this.fullScrollHeight = Math.round(358 / parent.scale);
-        int contentHeight = players.size() * fullScrollHeight / blockElementsAmount;
+        int contentHeight = parent.getBets().size() * fullScrollHeight / blockElementsAmount;
 //        int contentHeight = Math.round((38 + 2) / parent.scale);
         scrollHeight = Math.min(fullScrollHeight, (int) (fullScrollHeight * (float)fullScrollHeight / contentHeight));
         scrollOffset = 0;
 
-        System.out.println("SCALE " + new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor());
+//        System.out.println("SCALE " + new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor());
     }
 
     @Override
@@ -95,9 +90,10 @@ public class SubGuiBetBlock extends SubGuiImage {
 
         int posY = 0;
         float textX = 8 / ((GuiRoulette) parent).scale;
+        float textXChips = 26 / ((GuiRoulette) parent).scale;
         float textY;
 
-        for (String player : players) {
+        for (PlayerBetDTO betDTO : ((GuiRoulette) parent).getBets()) {
             GuiTextures.SELECT_BOX.bind();
             drawScaledCustomSizeModalRect(0, posY,
                     0, 0,
@@ -111,7 +107,19 @@ public class SubGuiBetBlock extends SubGuiImage {
             GL11.glTranslatef(textX, textY, 1);
             GL11.glScaled(3 / ((GuiRoulette) parent).scale, 3 / ((GuiRoulette) parent).scale, 3 / ((GuiRoulette) parent).scale);
 
-            UIConstants.FONT.drawString(player,
+            UIConstants.FONT.drawString(betDTO.getNick(),
+                    0,
+                    0,
+                    Color.WHITE.getRGB());
+
+            GL11.glPopMatrix();
+
+            GL11.glPushMatrix();
+
+            GL11.glTranslatef(textXChips, textY, 1);
+            GL11.glScaled(3 / ((GuiRoulette) parent).scale, 3 / ((GuiRoulette) parent).scale, 3 / ((GuiRoulette) parent).scale);
+
+            UIConstants.FONT.drawString(String.valueOf(betDTO.getChips()),
                     0,
                     0,
                     Color.WHITE.getRGB());

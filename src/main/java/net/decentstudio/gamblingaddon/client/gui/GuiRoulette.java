@@ -4,7 +4,9 @@ import com.narutocraft.api.client.gui.ISubGuiItem;
 import com.narutocraft.client.font.CustomFontsEnum;
 import com.narutocraft.client.gui.NarutoCraftGuiScreen;
 import com.narutocraft.client.gui.subgui.SubGuiButton;
+import lombok.Getter;
 import net.decentstudio.gamblingaddon.client.gui.subgui.*;
+import net.decentstudio.gamblingaddon.dto.PlayerBetDTO;
 import net.decentstudio.gamblingaddon.util.ui.GuiIds;
 import net.decentstudio.gamblingaddon.util.ui.GuiTextures;
 import net.minecraft.client.renderer.GlStateManager;
@@ -13,6 +15,8 @@ import net.minecraft.client.resources.Language;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GuiRoulette extends NarutoCraftGuiScreen implements ITextFieldListener {
 
@@ -22,7 +26,14 @@ public class GuiRoulette extends NarutoCraftGuiScreen implements ITextFieldListe
 
     private Language language;
 
-    public GuiRoulette() {
+    @Getter
+    private int balance;
+
+    @Getter
+    private final List<PlayerBetDTO> bets = new ArrayList<>();
+
+    public GuiRoulette(int balance) {
+        this.balance = balance;
     }
 
     public void initGui() {
@@ -48,12 +59,12 @@ public class GuiRoulette extends NarutoCraftGuiScreen implements ITextFieldListe
         addImage(wheel);
         wheel.initGui();
 
-        SubGuiBlock block = new SubGuiBlock(this, GuiIds.BLOCK,
-                background.posX + 776 / scale, background.posY + 116 / scale,
-                GuiIds.INPUT, GuiIds.MAX, GuiIds.DOUBLE, GuiIds.HALF, GuiIds.RESET);
-
-        addImage(block);
-        block.initGui();
+//        SubGuiBlock block = new SubGuiBlock(this, GuiIds.BLOCK,
+//                background.posX + 776 / scale, background.posY + 116 / scale,
+//                GuiIds.INPUT, GuiIds.MAX, GuiIds.DOUBLE, GuiIds.HALF, GuiIds.RESET);
+//
+//        addImage(block);
+//        block.initGui();
 
         SubGuiBalance balance = new SubGuiBalance(this, 10,
                 background.posX + background.width - 243 / scale - 110 / scale, background.posY + 23 / scale,
@@ -74,6 +85,8 @@ public class GuiRoulette extends NarutoCraftGuiScreen implements ITextFieldListe
                 GuiTextures.CLOSE_BUTTON);
 
         addButton(closeButton);
+
+        updateBets(new ArrayList<>());
     }
 
     @Override
@@ -84,6 +97,9 @@ public class GuiRoulette extends NarutoCraftGuiScreen implements ITextFieldListe
 
             if (button.getId() == 11) {
                 mc.displayGuiScreen(null);
+            } else if (iSubGuiItem instanceof SubGuiBetButton) {
+                SubGuiBetButton betButton = (SubGuiBetButton) iSubGuiItem;
+                betButton.handleClick();
             }
         }
     }
@@ -164,5 +180,33 @@ public class GuiRoulette extends NarutoCraftGuiScreen implements ITextFieldListe
     @Override
     public void endTextFieldChanged(SubGuiTextField textField) {
 
+    }
+
+    public void updateBets(List<PlayerBetDTO> bets) {
+        ISubGuiItem background = subGuiItemList.stream().findAny()
+                .filter(item -> item.getId() == GuiIds.BACKGROUND)
+                .orElse(null);
+
+        if (!(background instanceof SubGuiImageTransient)) {
+            return;
+        }
+
+        this.bets.clear();
+        this.bets.addAll(bets);
+        if (subGuiItemList.stream().anyMatch(item -> item.getId() == GuiIds.BLOCK)) {
+            removeItem(GuiIds.BLOCK);
+        }
+
+        SubGuiBlock block = new SubGuiBlock(this, GuiIds.BLOCK,
+                ((SubGuiImageTransient) background).posX + 776 / scale,
+                ((SubGuiImageTransient) background).posY + 116 / scale,
+                GuiIds.INPUT, GuiIds.MAX, GuiIds.DOUBLE, GuiIds.HALF, GuiIds.RESET);
+
+        addImage(block);
+        block.initGui();
+    }
+
+    public void updateBalance(int chips) {
+        this.balance = chips;
     }
 }

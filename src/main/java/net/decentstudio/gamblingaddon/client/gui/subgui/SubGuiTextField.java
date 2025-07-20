@@ -2,22 +2,27 @@ package net.decentstudio.gamblingaddon.client.gui.subgui;
 
 import com.narutocraft.client.gui.subgui.SubGuiImage;
 import com.narutocraft.client.texture.api.ITextures;
+import lombok.Getter;
+import net.decentstudio.gamblingaddon.client.gui.GuiRoulette;
 import net.decentstudio.gamblingaddon.util.ui.UIConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ChatAllowedCharacters;
 import org.lwjgl.opengl.GL11;
-import net.decentstudio.gamblingaddon.client.gui.GuiRoulette;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SubGuiTextField extends SubGuiImage {
 
     protected boolean isEdit;
-    protected String allowedSymbols;
-    protected String text;
+    protected List<Character> charsAllowed = new ArrayList<>();
     protected boolean changed;
     protected int color;
+
+    @Getter
+    protected String text;
 
     public SubGuiTextField(GuiRoulette parent,
                            int id,
@@ -32,8 +37,16 @@ public class SubGuiTextField extends SubGuiImage {
                            float tileWidth,
                            float tileHeight,
                            ITextures texture,
-                           String defaultValue) {
-        this(parent, id, posX, posY, u, v, uWidth, vHeight, width, height, tileWidth, tileHeight, texture, defaultValue, Color.BLACK.getRGB());
+                           String defaultValue,
+                           char[] charsAllowed) {
+        this(parent, id,
+                posX, posY,
+                u, v,
+                uWidth, vHeight,
+                width, height,
+                tileWidth, tileHeight,
+                texture, defaultValue,
+                Color.BLACK.getRGB(), charsAllowed);
     }
 
     public SubGuiTextField(GuiRoulette parent,
@@ -50,14 +63,18 @@ public class SubGuiTextField extends SubGuiImage {
                            float tileHeight,
                            ITextures texture,
                            String defaultValue,
-                           int color) {
+                           int color,
+                           char[] charsAllowed) {
 
         super(parent, id, posX, posY, u, v, uWidth, vHeight, width, height, tileWidth, tileHeight, texture);
         this.isEdit = false;
         this.text = defaultValue;
-        this.allowedSymbols = "";
         this.changed = false;
         this.color = color;
+
+        for(char c : charsAllowed) {
+            this.charsAllowed.add(c);
+        }
     }
 
     @Override
@@ -102,10 +119,6 @@ public class SubGuiTextField extends SubGuiImage {
         }
     }
 
-    public void setAllowedSymbols(String allowedSymbols) {
-        this.allowedSymbols = allowedSymbols;
-    }
-
     @Override
     public void keyTyped(char typedChar, int keyCode) {
         if(isEdit) {
@@ -118,25 +131,28 @@ public class SubGuiTextField extends SubGuiImage {
                     }
                 }
             } else {
-                try {
-                    if (allowedSymbols.isEmpty()) {
-                        if (ChatAllowedCharacters.isAllowedCharacter(typedChar)) {
-                            text += typedChar;
-                            if (parent instanceof ITextFieldListener) {
-                                ((ITextFieldListener) parent).textFieldChanged(this);
-                                changed = true;
+                if (text.length() < 10) {
+                    try {
+                        if (charsAllowed == null || charsAllowed.isEmpty()) {
+                            if (ChatAllowedCharacters.isAllowedCharacter(typedChar)) {
+                                text += typedChar;
+                                if (parent instanceof ITextFieldListener) {
+                                    ((ITextFieldListener) parent).textFieldChanged(this);
+                                    changed = true;
+                                }
+                            }
+                        } else {
+                            if (charsAllowed.contains(typedChar)) {
+                                text += typedChar;
+                                if (parent instanceof ITextFieldListener) {
+                                    ((ITextFieldListener) parent).textFieldChanged(this);
+                                    changed = true;
+                                }
                             }
                         }
-                    } else {
-                        if (allowedSymbols.contains(String.valueOf(typedChar))) {
-                            text += typedChar;
-                            if (parent instanceof ITextFieldListener) {
-                                ((ITextFieldListener) parent).textFieldChanged(this);
-                                changed = true;
-                            }
-                        }
+                    } catch (Exception ignored) {
                     }
-                } catch (Exception ignored) {}
+                }
             }
         }
 
@@ -152,14 +168,10 @@ public class SubGuiTextField extends SubGuiImage {
             changed = false;
         }
         this.isEdit = false;
-        if(mouseX >= posX && mouseX <= posX + width && mouseY >= posY && mouseY <= posY + height) {
+        if (mouseX >= posX && mouseX <= posX + width && mouseY >= posY && mouseY <= posY + height) {
             isEdit = true;
         }
 
         return super.tryClick(mouseX, mouseY, mouseButton);
-    }
-
-    public String getText() {
-        return text;
     }
 }

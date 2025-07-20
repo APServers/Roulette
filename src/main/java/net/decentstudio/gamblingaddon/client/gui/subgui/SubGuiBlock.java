@@ -40,7 +40,8 @@ public class SubGuiBlock extends SubGuiImage {
                 Math.round(321 / ((GuiRoulette) parent).scale), Math.round(43 / ((GuiRoulette) parent).scale),
                 321, 43,
                 GuiTextures.INPUT,
-                "Type an amount..");
+                "",
+                new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'});
 
         ((GuiRoulette) parent).addImage(input);
 

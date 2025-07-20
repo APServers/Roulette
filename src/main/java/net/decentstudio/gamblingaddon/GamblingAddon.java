@@ -1,8 +1,17 @@
 package net.decentstudio.gamblingaddon;
 
-import net.decentstudio.gamblingaddon.network.C1PacketOpenRouletteGui;
-import net.decentstudio.gamblingaddon.network.S1PacketOpenRouletteGui;
+import lombok.Getter;
+import net.decentstudio.gamblingaddon.network.*;
 import net.decentstudio.gamblingaddon.proxy.CommonProxy;
+import net.decentstudio.gamblingaddon.repository.BalanceRepository;
+import net.decentstudio.gamblingaddon.repository.BidRepository;
+import net.decentstudio.gamblingaddon.repository.GameRoomRepository;
+import net.decentstudio.gamblingaddon.repository.impl.BalanceRepositoryImpl;
+import net.decentstudio.gamblingaddon.repository.impl.BidRepositoryImpl;
+import net.decentstudio.gamblingaddon.repository.impl.GameRoomRepositoryImpl;
+import net.decentstudio.gamblingaddon.service.RouletteGameService;
+import net.decentstudio.gamblingaddon.service.impl.RouletteGameServiceImpl;
+import net.decentstudio.gamblingaddon.util.BuilderUtils;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -31,9 +40,30 @@ public class GamblingAddon
     )
     public static CommonProxy proxy;
 
+    @Getter
+    private static BalanceRepository balanceRepository;
+    @Getter
+    private static BidRepository bidRepository;
+    @Getter
+    private static GameRoomRepository gameRoomRepository;
+
+    @Getter
+    private static RouletteGameService rouletteGameService;
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        proxy.preInit(event);
+        if (!BuilderUtils.ISCLIENT) {
+            balanceRepository = new BalanceRepositoryImpl();
+            bidRepository = new BidRepositoryImpl();
+            gameRoomRepository = new GameRoomRepositoryImpl();
+
+            rouletteGameService = new RouletteGameServiceImpl(
+                    gameRoomRepository,
+                    bidRepository,
+                    balanceRepository
+            );
+        }
+
         registerModPackets();
     }
 
@@ -51,7 +81,7 @@ public class GamblingAddon
     public void serverStarting(FMLServerStartingEvent event) {
 //        new ChallengesManager(challengesDAO).init();
 
-        //event.registerServerCommand(new TestCommand());
+        event.registerServerCommand(new TestCommand());
     }
 
     private void registerModPackets() {
@@ -63,6 +93,21 @@ public class GamblingAddon
         GamblingAddon.NETWORK.registerMessage(S1PacketOpenRouletteGui.Handler.class,
                 S1PacketOpenRouletteGui.class,
                 1,
+                Side.SERVER);
+
+        GamblingAddon.NETWORK.registerMessage(C2PacketUpdateBets.Handler.class,
+                C2PacketUpdateBets.class,
+                2,
+                Side.CLIENT);
+
+        GamblingAddon.NETWORK.registerMessage(S2PacketBet.Handler.class,
+                S2PacketBet.class,
+                3,
+                Side.SERVER);
+
+        GamblingAddon.NETWORK.registerMessage(S3PacketUpdateBalance.Handler.class,
+                S3PacketUpdateBalance.class,
+                4,
                 Side.SERVER);
     }
 }

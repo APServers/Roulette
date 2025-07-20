@@ -9,23 +9,21 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class C1PacketOpenRouletteGui implements IMessage {
+public class C2PacketUpdateBets implements IMessage {
 
-    private int balance;
-    private List<PlayerBetDTO> bets;
+    private List<PlayerBetDTO> bets = new ArrayList<>();
 
-    public C1PacketOpenRouletteGui() {}
+    public C2PacketUpdateBets() {}
 
-    public C1PacketOpenRouletteGui(int balance, List<PlayerBetDTO> bets) {
-        this.balance = balance;
+    public C2PacketUpdateBets(List<PlayerBetDTO> bets) {
         this.bets = bets;
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        this.balance = buf.readInt();
         int size = buf.readInt();
         for (int i = 0; i < size; i++) {
             String nick = ByteBufUtils.readUTF8String(buf);
@@ -38,15 +36,13 @@ public class C1PacketOpenRouletteGui implements IMessage {
                 return;
             }
 
-            PlayerBetDTO bet = new PlayerBetDTO(nick, chips, sectionColor, roomId);
-            bets.add(bet);
+            bets.add(new PlayerBetDTO(nick, chips, sectionColor, roomId));
         }
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeInt(balance);
-        buf.writeInt(bets == null ? 0 : bets.size());
+        buf.writeInt(bets.size());
         for (PlayerBetDTO bet : bets) {
             ByteBufUtils.writeUTF8String(buf, bet.getNick());
             buf.writeInt(bet.getChips());
@@ -55,10 +51,10 @@ public class C1PacketOpenRouletteGui implements IMessage {
         }
     }
 
-    public static class Handler implements IMessageHandler<C1PacketOpenRouletteGui, IMessage> {
+    public static class Handler implements IMessageHandler<C2PacketUpdateBets, IMessage> {
         @Override
-        public IMessage onMessage(C1PacketOpenRouletteGui packet, MessageContext ctx) {
-            GamblingAddon.proxy.openRouletteGui(null, packet.balance);
+        public IMessage onMessage(C2PacketUpdateBets packet, MessageContext ctx) {
+            GamblingAddon.proxy.updateBets(packet.bets);
             return null;
         }
     }

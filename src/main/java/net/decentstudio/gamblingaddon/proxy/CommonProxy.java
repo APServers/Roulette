@@ -1,35 +1,19 @@
 package net.decentstudio.gamblingaddon.proxy;
 
-import net.decentstudio.gamblingaddon.repository.BalanceRepository;
-import net.decentstudio.gamblingaddon.repository.BidRepository;
-import net.decentstudio.gamblingaddon.repository.GameRoomRepository;
-import net.decentstudio.gamblingaddon.repository.impl.BalanceRepositoryImpl;
-import net.decentstudio.gamblingaddon.repository.impl.BidRepositoryImpl;
-import net.decentstudio.gamblingaddon.repository.impl.GameRoomRepositoryImpl;
-import net.decentstudio.gamblingaddon.service.RouletteGameService;
-import net.decentstudio.gamblingaddon.service.impl.RouletteGameServiceImpl;
+import net.decentstudio.gamblingaddon.dto.PlayerBetDTO;
+import net.decentstudio.gamblingaddon.util.game.SectionColor;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
+import java.util.List;
+
 public class CommonProxy {
 
-    private BalanceRepository balanceRepository;
-    private BidRepository bidRepository;
-    private GameRoomRepository gameRoomRepository;
 
-    private RouletteGameService rouletteGameService;
 
     public void preInit(FMLPreInitializationEvent event) {
-        balanceRepository = new BalanceRepositoryImpl();
-        bidRepository = new BidRepositoryImpl();
-        gameRoomRepository = new GameRoomRepositoryImpl();
-
-        rouletteGameService = new RouletteGameServiceImpl(
-                gameRoomRepository,
-                bidRepository,
-                balanceRepository
-        );
     }
 
     public void init(FMLInitializationEvent event) {
@@ -38,6 +22,16 @@ public class CommonProxy {
     public void postInit(FMLPostInitializationEvent event) {
     }
 
-    public void openRouletteGui() {
+    public void openRouletteGui(EntityPlayer player, int balance) {
+
     }
+
+    public void updateBets(List<PlayerBetDTO> bets) {
+
+    }
+
+    public void bet(EntityPlayer player, int chips, SectionColor color) {
+    }
+
+    public void updateBalance(int chips) {}
 }

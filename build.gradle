@@ -32,6 +32,9 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
             property 'forge.logging.console.level', 'debug'
+
+            def mcuser = project.hasProperty("mcuser") ? project.getProperty("mcuser") : "Player${new Random().nextInt(1000)}"
+            args "--username=" + mcuser.toString()
         }
 
         server {

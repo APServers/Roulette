@@ -1,13 +1,15 @@
 package net.decentstudio.gamblingaddon.service;
 
-import net.decentstudio.gamblingaddon.domain.BidSection;
-import net.minecraft.entity.player.EntityPlayer;
+import net.decentstudio.gamblingaddon.dto.PlayerBetDTO;
+import net.decentstudio.gamblingaddon.util.game.SectionColor;
+import net.minecraft.entity.player.EntityPlayerMP;
 
-import java.math.BigDecimal;
-import java.util.UUID;
+import java.util.List;
 
 public interface RouletteGameService {
-    void placeBid(EntityPlayer player, BidSection section, Integer amount);
+    void placeBet(EntityPlayerMP player, Integer amount, SectionColor color);
     int spinWheel(int gameRoomId);
     void startNewGame(int gameRoomId);
+    int findGameRoomId(EntityPlayerMP player);
+    List<PlayerBetDTO> findBetsByGameRoomId(int gameRoomId);
 }

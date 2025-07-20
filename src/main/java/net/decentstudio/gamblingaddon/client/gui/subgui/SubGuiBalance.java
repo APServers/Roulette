@@ -3,8 +3,11 @@ package net.decentstudio.gamblingaddon.client.gui.subgui;
 import com.narutocraft.client.gui.subgui.SubGuiImage;
 import com.narutocraft.client.texture.api.ITextures;
 import net.decentstudio.gamblingaddon.client.gui.GuiRoulette;
-import org.lwjgl.opengl.GL11;
 import net.decentstudio.gamblingaddon.util.ui.GuiTextures;
+import net.decentstudio.gamblingaddon.util.ui.UIConstants;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
 
 public class SubGuiBalance extends SubGuiImage {
 
@@ -42,6 +45,19 @@ public class SubGuiBalance extends SubGuiImage {
                 200, 200,
                 Math.round(40 / ((GuiRoulette) parent).scale), Math.round(40 / ((GuiRoulette) parent).scale),
                 200, 200);
+
+        GL11.glPopMatrix();
+
+        String balanceText = String.valueOf(((GuiRoulette) parent).getBalance());
+        GL11.glPushMatrix();
+
+        GL11.glTranslatef(posX + 65 / ((GuiRoulette) parent).scale, posY + 15 / ((GuiRoulette) parent).scale, 10);
+        GL11.glScaled(3 / ((GuiRoulette) parent).scale, 3 / ((GuiRoulette) parent).scale, 3 / ((GuiRoulette) parent).scale);
+
+        UIConstants.FONT.drawString(balanceText,
+                0,
+                0,
+                Color.WHITE.getRGB());
 
         GL11.glPopMatrix();
     }
