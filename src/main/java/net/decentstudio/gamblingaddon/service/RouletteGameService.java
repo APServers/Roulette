@@ -7,7 +7,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import java.util.List;
 
 public interface RouletteGameService {
-    void placeBet(EntityPlayerMP player, Integer amount, SectionColor color);
+    void placeBet(EntityPlayerMP player, Integer amount, SectionColor color) throws Exception;
     int spinWheel(int gameRoomId);
     void startNewGame(int gameRoomId);
     int findGameRoomId(EntityPlayerMP player);

@@ -50,7 +50,12 @@ public class S2PacketBet implements IMessage {
                     return null;
                 }
 
-                GamblingAddon.getRouletteGameService().placeBet(player, chips, color);
+                try {
+                    GamblingAddon.getRouletteGameService().placeBet(player, chips, color);
+                } catch (Exception e) {
+                    System.out.println("Failed to place bet: " + e.getMessage());
+                    return null;
+                }
             }
 
             return null;

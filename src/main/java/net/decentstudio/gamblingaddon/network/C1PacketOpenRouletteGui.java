@@ -27,6 +27,10 @@ public class C1PacketOpenRouletteGui implements IMessage {
     public void fromBytes(ByteBuf buf) {
         this.balance = buf.readInt();
         int size = buf.readInt();
+        if (size <= 0) {
+            return;
+        }
+
         for (int i = 0; i < size; i++) {
             String nick = ByteBufUtils.readUTF8String(buf);
             int chips = buf.readInt();

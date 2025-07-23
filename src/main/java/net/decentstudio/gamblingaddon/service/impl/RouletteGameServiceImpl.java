@@ -29,8 +29,8 @@ public class RouletteGameServiceImpl implements RouletteGameService {
 
     private final Random random = new Random();
     
-    public synchronized void placeBet(EntityPlayerMP player, Integer amount, SectionColor section) {
-        if (!BuilderUtils.ISCLIENT) {
+    public synchronized void placeBet(EntityPlayerMP player, Integer amount, SectionColor section) throws Exception {
+        if (BuilderUtils.ISCLIENT) {
             return;
         }
 
@@ -50,7 +50,7 @@ public class RouletteGameServiceImpl implements RouletteGameService {
 
         GameRoom room = roomOpt.get();
         
-        if (room.getStatus() != GameStatus.BETTING) {
+        if (room.getStatus() != GameStatus.BETTING && room.getStatus() != GameStatus.WAITING) {
             throw new IllegalStateException("Room not accepting bids");
         }
 
@@ -66,13 +66,18 @@ public class RouletteGameServiceImpl implements RouletteGameService {
         Bet bid = new Bet(UUID.randomUUID(), player.getName(), player, section, amount);
         room.getBids().add(bid);
         bidRepository.save(bid);
-        gameRoomRepository.save(room);
+//        gameRoomRepository.save(room);
+
+        if (room.getStatus() == GameStatus.WAITING) {
+            room.setStatus(GameStatus.BETTING);
+//            gameRoomRepository.save(room);
+        }
 
         updateBids(room);
     }
 
     private void updateBids(GameRoom room) {
-        if (!BuilderUtils.ISCLIENT) {
+        if (BuilderUtils.ISCLIENT) {
             return;
         }
 
@@ -83,7 +88,7 @@ public class RouletteGameServiceImpl implements RouletteGameService {
     }
     
     public int spinWheel(int gameRoomId) {
-        if (!BuilderUtils.ISCLIENT) {
+        if (BuilderUtils.ISCLIENT) {
             return -1;
         }
 
@@ -115,7 +120,7 @@ public class RouletteGameServiceImpl implements RouletteGameService {
 
     @Override
     public void startNewGame(int gameRoomId) {
-        if (!BuilderUtils.ISCLIENT) {
+        if (BuilderUtils.ISCLIENT) {
             return;
         }
 
@@ -132,7 +137,7 @@ public class RouletteGameServiceImpl implements RouletteGameService {
 
     @Override
     public int findGameRoomId(EntityPlayerMP player) {
-        if (!BuilderUtils.ISCLIENT) {
+        if (BuilderUtils.ISCLIENT) {
             return -1;
         }
 
@@ -141,7 +146,7 @@ public class RouletteGameServiceImpl implements RouletteGameService {
 
     @Override
     public List<PlayerBetDTO> findBetsByGameRoomId(int gameRoomId) {
-        if (!BuilderUtils.ISCLIENT) {
+        if (BuilderUtils.ISCLIENT) {
             return new ArrayList<>();
         }
 
@@ -157,7 +162,7 @@ public class RouletteGameServiceImpl implements RouletteGameService {
     }
     
     private boolean isWinningBid(Bet bid, int winningNumber, SectionColor winningColor) {
-        if (!BuilderUtils.ISCLIENT) {
+        if (BuilderUtils.ISCLIENT) {
             return false;
         }
 
@@ -173,7 +178,7 @@ public class RouletteGameServiceImpl implements RouletteGameService {
     }
     
     private void payoutWinner(Bet bid) {
-        if (!BuilderUtils.ISCLIENT) {
+        if (BuilderUtils.ISCLIENT) {
             return;
         }
 
@@ -189,7 +194,7 @@ public class RouletteGameServiceImpl implements RouletteGameService {
     }
     
     private Integer calculatePayout(Bet bid) {
-        if (!BuilderUtils.ISCLIENT) {
+        if (BuilderUtils.ISCLIENT) {
             return 0;
         }
 
@@ -209,6 +214,10 @@ public class RouletteGameServiceImpl implements RouletteGameService {
     }
     
     private SectionColor getColorForNumber(int number) {
+        if (BuilderUtils.ISCLIENT) {
+            return null;
+        }
+
         if (number == 0) return SectionColor.GREEN;
         
         // European roulette red numbers

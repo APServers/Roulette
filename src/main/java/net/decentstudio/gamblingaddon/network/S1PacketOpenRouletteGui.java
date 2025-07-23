@@ -35,8 +35,6 @@ public class S1PacketOpenRouletteGui implements IMessage {
 
                 BalanceRepository balanceRepository = GamblingAddon.getBalanceRepository();
                 RouletteGameService rouletteGameService = GamblingAddon.getRouletteGameService();
-                System.out.println(balanceRepository + " " + rouletteGameService);
-                System.out.println("test bal " + balanceRepository.findBalance(ctx.getServerHandler().player) + " " + ctx.getServerHandler().player);
                 int balance = balanceRepository.findBalance(player).orElse(0);
                 int roomId = rouletteGameService.findGameRoomId(player);
                 List<PlayerBetDTO> bets = rouletteGameService.findBetsByGameRoomId(roomId);
